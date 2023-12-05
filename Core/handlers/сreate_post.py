@@ -57,12 +57,13 @@ async def setup_date(message: Message, state: FSMContext):
 
 
 async def failed_setup_date(message: Message):
-    await message.answer(text="Write the time in correct format ('YYYY:MM:DD')!\nFor instance: '2023:12:31'")
+    await message.answer(text="Write the time in correct format ('YYYY-MM-DD')!\nFor instance: '2023-12-31'")
 
 
 async def setup_picture(message: Message, state: FSMContext):
     post_data = await state.get_data()
-    caption = f"<b>{post_data['title']}</b>\n{post_data['description']}"
+    caption = f"<b>{post_data['title']}</b>\n{post_data['description']}\n\n" \
+              f"<i>{post_data['time']}\n{post_data['date']}</i>"
     await message.answer_photo(photo=message.photo[-1].file_id, caption=caption,
                                reply_markup=confirm_post_builder.as_markup(resize_keyboard=True))
     await state.set_state(CreatePostState.confirm_post_state)
@@ -70,7 +71,8 @@ async def setup_picture(message: Message, state: FSMContext):
 
 async def skipped_picture(message: Message, state: FSMContext):
     post_data = await state.get_data()
-    text = f"<b>{post_data['title']}</b>\n{post_data['description']}"
+    text = f"<b>{post_data['title']}</b>\n{post_data['description']}\n\n" \
+           f"<i>{post_data['time']}\n{post_data['date']}</i>"
     await message.answer(text=text,
                          reply_markup=confirm_post_builder.as_markup(resize_keyboard=True))
     await state.set_state(CreatePostState.confirm_post_state)
