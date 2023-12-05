@@ -8,3 +8,4 @@ class CreatePostState(StatesGroup):
     time_state = State()
     date_state = State()
     picture_state = State()
+    confirm_post_state = State()

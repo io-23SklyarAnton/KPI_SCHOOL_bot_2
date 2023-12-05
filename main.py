@@ -5,7 +5,7 @@ from Core.routers.basic_router import basic_router
 
 
 async def main():
-    bot = Bot(TOKEN)
+    bot = Bot(TOKEN, parse_mode="HTML")
     dp = Dispatcher()
     dp.include_routers(basic_router)
     await dp.start_polling(bot)

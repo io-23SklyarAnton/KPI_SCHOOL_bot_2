@@ -14,3 +14,6 @@ time_builder = InlineKeyboardBuilder()
 for hour in range(0, 24):
     time_builder.add(InlineKeyboardButton(text=f"{hour:02}", callback_data=f"set_time-{hour:02}:00"))
     time_builder.adjust(6)
+
+confirm_post_builder = ReplyKeyboardBuilder()
+confirm_post_builder.row(KeyboardButton(text="/save_post"), KeyboardButton(text="/decline_post"))

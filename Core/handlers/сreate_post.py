@@ -1,7 +1,8 @@
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from Core.routers.states import CreatePostState
-from Core.keyboard.create_post_keyboard import start_builder, cancel_builder, skip_img_builder, time_builder
+from Core.keyboard.create_post_keyboard import start_builder, cancel_builder, skip_img_builder, time_builder, \
+    confirm_post_builder
 
 
 async def cancel_post(message: Message, state: FSMContext):
@@ -45,13 +46,13 @@ async def time_callback(callback: CallbackQuery, state: FSMContext):
 
 
 async def failed_setup_time(message: Message):
-    await message.answer(text="Select the time!",reply_markup=time_builder.as_markup(resize_keyboard=True))
+    await message.answer(text="Select the time!", reply_markup=time_builder.as_markup(resize_keyboard=True))
 
 
 async def setup_date(message: Message, state: FSMContext):
     await state.update_data(date=message.text)
     await message.answer(text="The date is set successfully!\nSend the post picture",
-                         reply_markup=skip_img_builder.as_markup())
+                         reply_markup=skip_img_builder.as_markup(resize_keyboard=True))
     await state.set_state(CreatePostState.picture_state)
 
 
@@ -60,17 +61,32 @@ async def failed_setup_date(message: Message):
 
 
 async def setup_picture(message: Message, state: FSMContext):
-    await state.update_data(picture=message.photo[-1])
-    await message.answer(text="The picture is set successfully!\nYour post is ready to send!",
-                         reply_markup=start_builder.as_markup())
-    await state.set_state(CreatePostState.start_state)
+    post_data = await state.get_data()
+    caption = f"<b>{post_data['title']}</b>\n{post_data['description']}"
+    await message.answer_photo(photo=message.photo[-1].file_id, caption=caption,
+                               reply_markup=confirm_post_builder.as_markup(resize_keyboard=True))
+    await state.set_state(CreatePostState.confirm_post_state)
 
 
 async def skipped_picture(message: Message, state: FSMContext):
-    await message.answer(text="Your post is ready to send!",
-                         reply_markup=start_builder.as_markup())
-    await state.set_state(CreatePostState.start_state)
+    post_data = await state.get_data()
+    text = f"<b>{post_data['title']}</b>\n{post_data['description']}"
+    await message.answer(text=text,
+                         reply_markup=confirm_post_builder.as_markup(resize_keyboard=True))
+    await state.set_state(CreatePostState.confirm_post_state)
 
 
 async def failed_setup_picture(message: Message):
-    await message.answer(text="Send the picture!")
+    await message.answer(text="Send the picture or skip it!")
+
+
+async def post_confirmed(message: Message, state: FSMContext):
+    await message.answer(text="post saved",
+                         reply_markup=start_builder.as_markup(resize_keyboard=True))
+    await state.set_state(CreatePostState.start_state)
+
+
+async def post_declined(message: Message, state: FSMContext):
+    await message.answer(text="previous post declined\nwrite the title again!",
+                         reply_markup=cancel_builder.as_markup(resize_keyboard=True))
+    await state.set_state(CreatePostState.title_state)

@@ -9,10 +9,11 @@ write_description_router = Router()
 setup_time_router = Router()
 setup_date_router = Router()
 setup_picture_router = Router()
+confirm_post_router = Router()
 
 # add routers to base router
 create_post_routers = (write_title_router, write_description_router, setup_time_router,
-                       setup_date_router, setup_picture_router)
+                       setup_date_router, setup_picture_router, confirm_post_router)
 base_post_router.include_routers(*create_post_routers)
 
 # register handlers
@@ -34,3 +35,6 @@ setup_date_router.message.register(c_p.failed_setup_date, CreatePostState.date_s
 setup_picture_router.message.register(c_p.setup_picture, CreatePostState.picture_state, F.photo)
 setup_picture_router.message.register(c_p.skipped_picture, CreatePostState.picture_state, F.text == "skip")
 setup_picture_router.message.register(c_p.failed_setup_picture, CreatePostState.picture_state)
+
+confirm_post_router.message.register(c_p.post_confirmed, CreatePostState.confirm_post_state, Command("save_post"))
+confirm_post_router.message.register(c_p.post_declined, CreatePostState.confirm_post_state, Command("decline_post"))
