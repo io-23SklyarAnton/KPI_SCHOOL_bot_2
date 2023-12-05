@@ -1,7 +1,7 @@
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from Core.routers.states import CreatePostState
-from Core.keyboard.create_post_keyboard import start_builder, cancel_builder, skip_img_builder
+from Core.keyboard.create_post_keyboard import start_builder, cancel_builder, skip_img_builder, time_builder
 
 
 async def cancel_post(message: Message, state: FSMContext):
@@ -28,7 +28,8 @@ async def failed_title(message: Message):
 
 async def write_description(message: Message, state: FSMContext):
     await state.update_data(description=message.text)
-    await message.answer(text="The description created successfully!\nSelect the post time:")
+    await message.answer(text="The description created successfully!\nSelect the post time:",
+                         reply_markup=time_builder.as_markup(resize_keyboard=True))
     await state.set_state(CreatePostState.time_state)
 
 
@@ -36,14 +37,15 @@ async def failed_description(message: Message):
     await message.answer(text="Write a simple text to create the description!")
 
 
-async def setup_time(message: Message, state: FSMContext):
-    await state.update_data(time=message.text)
-    await message.answer(text="The time is set successfully!\nWrite down the post date ('YYYY:MM:DD')")
+async def time_callback(callback: CallbackQuery, state: FSMContext):
+    time = callback.data.split("-")[1]
+    await state.update_data(time=time)
+    await callback.message.answer(text="The time is set successfully!\nWrite down the post date ('YYYY:MM:DD')")
     await state.set_state(CreatePostState.date_state)
 
 
 async def failed_setup_time(message: Message):
-    await message.answer(text="Write the time in correct format ('HH:MI:SS')!\nFor instance: '21:23:01'")
+    await message.answer(text="Select the time!",reply_markup=time_builder.as_markup(resize_keyboard=True))
 
 
 async def setup_date(message: Message, state: FSMContext):
