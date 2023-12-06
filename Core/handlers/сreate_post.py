@@ -57,7 +57,7 @@ async def setup_date(message: Message, state: FSMContext):
 
 
 async def failed_setup_date(message: Message):
-    await message.answer(text="Write the time in correct format ('YYYY-MM-DD')!\nFor instance: '2023-12-31'")
+    await message.answer(text="Write the date in correct format ('YYYY-MM-DD')!\nFor instance: '2023-12-31'")
 
 
 async def setup_picture(message: Message, state: FSMContext):

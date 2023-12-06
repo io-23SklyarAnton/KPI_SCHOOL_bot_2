@@ -27,7 +27,7 @@ write_description_router.message.register(c_p.write_description, CreatePostState
 write_description_router.message.register(c_p.failed_description, CreatePostState.description_state)
 
 setup_time_router.callback_query.register(c_p.time_callback, CreatePostState.time_state, F.data.startswith("set_time"))
-setup_time_router.message.register(c_p.failed_setup_date, CreatePostState.time_state)
+setup_time_router.message.register(c_p.failed_setup_time, CreatePostState.time_state)
 
 setup_date_router.message.register(c_p.setup_date, CreatePostState.date_state, F.text)
 setup_date_router.message.register(c_p.failed_setup_date, CreatePostState.date_state)
